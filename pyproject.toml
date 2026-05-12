@@ -15,6 +15,8 @@ ignore = [
     "S105",   # hardcoded passwords — handled by bandit
     "S106",
     "B008",   # FastAPI Depends() calls in function defaults
+    "E712",   # SQLAlchemy filter calls require explicit comparison to True/False
+    "UP046",  # Traditional Generic inheritance preferred for IDE compatibility
 ]
 per-file-ignores = { "tests/*" = ["S", "E501"], "seeds/*" = ["S", "E501"] }
 

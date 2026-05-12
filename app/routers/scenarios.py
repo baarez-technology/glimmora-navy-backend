@@ -69,7 +69,7 @@ async def list_scenarios(
     db: Session = Depends(get_db),
 ):
     """List scenarios with optional domain and difficulty filters."""
-    query = db.query(Scenario).filter(not Scenario.is_archived)
+    query = db.query(Scenario).filter(Scenario.is_archived == False)
     if domain:
         query = query.filter(Scenario.domain == domain)
     if difficulty:
@@ -228,7 +228,7 @@ async def start_scenario(
 ):
     """Instantiate a training session from this scenario."""
     scenario = (
-        db.query(Scenario).filter(Scenario.id == scenario_id, not Scenario.is_archived).first()
+        db.query(Scenario).filter(Scenario.id == scenario_id, Scenario.is_archived == False).first()
     )
     if not scenario:
         raise HTTPException(status_code=404, detail="Scenario not found or archived")
@@ -284,7 +284,7 @@ async def get_variants(
         .filter(
             Scenario.domain == scenario.domain,
             Scenario.id != scenario_id,
-            not Scenario.is_archived,
+            Scenario.is_archived == False,
         )
         .limit(10)
         .all()

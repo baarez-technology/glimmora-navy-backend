@@ -158,7 +158,7 @@ async def get_pending_certifications(
             .filter(
                 Certification.user_id == trainee_id,
                 Certification.domain == scenario.domain,
-                not Certification.is_revoked,
+                Certification.is_revoked == False,
             )
             .first()
         )

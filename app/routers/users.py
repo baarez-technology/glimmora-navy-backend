@@ -34,7 +34,7 @@ async def get_roles_summary(
     """Get count of users per role. Admin and fleet only."""
     results = (
         db.query(User.role, func.count(User.id).label("count"))
-        .filter(User.is_active)
+        .filter(User.is_active == True)
         .group_by(User.role)
         .all()
     )
@@ -346,7 +346,7 @@ async def user_analytics(
     total_sessions = db.query(TrainingSession).filter(TrainingSession.trainee_id == user_id).count()
     certs_count = (
         db.query(Certification)
-        .filter(Certification.user_id == user_id, not Certification.is_revoked)
+        .filter(Certification.user_id == user_id, Certification.is_revoked == False)
         .count()
     )
 

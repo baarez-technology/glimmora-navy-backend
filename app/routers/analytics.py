@@ -87,7 +87,7 @@ async def trainee_analytics(
     sessions_count = db.query(TrainingSession).filter(TrainingSession.trainee_id == user_id).count()
     certs_count = (
         db.query(Certification)
-        .filter(Certification.user_id == user_id, not Certification.is_revoked)
+        .filter(Certification.user_id == user_id, Certification.is_revoked == False)
         .count()
     )
 
