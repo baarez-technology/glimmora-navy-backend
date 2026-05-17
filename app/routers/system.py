@@ -43,19 +43,12 @@ async def _check_redis() -> dict:
         return {"name": "Redis", "status": "offline", "details": str(exc)}
 
 
-async def _check_ollama() -> dict:
-    import httpx
-
-    try:
-        start = time.monotonic()
-        async with httpx.AsyncClient(timeout=httpx.Timeout(5.0)) as client:
-            resp = await client.get(f"{settings.OLLAMA_BASE_URL}/api/tags")
-        latency = round((time.monotonic() - start) * 1000, 2)
-        if resp.status_code == 200:
-            return {"name": "Ollama LLM", "status": "healthy", "latency_ms": latency}
-        return {"name": "Ollama LLM", "status": "degraded", "details": f"HTTP {resp.status_code}"}
-    except Exception as exc:
-        return {"name": "Ollama LLM", "status": "offline", "details": str(exc)}
+async def _check_ai() -> dict:
+    status_info = await ai_service.check_ai_status()
+    provider_name = settings.LLM_PROVIDER.capitalize()
+    if status_info["available"]:
+        return {"name": f"{provider_name} AI", "status": "healthy", "latency_ms": None}
+    return {"name": f"{provider_name} AI", "status": "offline", "details": status_info.get("status", "unknown")}
 
 
 async def _check_qdrant() -> dict:
@@ -89,10 +82,10 @@ async def health_check(
     """Full service health matrix — checks DB, Redis, Ollama, and Qdrant."""
     db_status = await _check_db(db)
     redis_status = await _check_redis()
-    ollama_status = await _check_ollama()
+    ai_status = await _check_ai()
     qdrant_status = await _check_qdrant()
 
-    services = [db_status, redis_status, ollama_status, qdrant_status]
+    services = [db_status, redis_status, ai_status, qdrant_status]
     statuses = [s["status"] for s in services]
 
     if all(s == "healthy" for s in statuses):
@@ -211,22 +204,23 @@ async def load_model(
 async def model_status(
     current_user: User = Depends(get_current_user),
 ):
-    """Return the model registry (what is loaded in Ollama)."""
-    status_info = await ai_service.check_ollama_status()
+    """Return the model registry (what is loaded/available)."""
+    status_info = await ai_service.check_ai_status()
     models = [
         {
             "model_name": m,
-            "status": "loaded",
+            "status": "available",
             "capabilities": ["chat", "generate", "embed"],
         }
-        for m in status_info.get("models", [])
+        for m in status_info.get("models", [settings.LLM_MODEL])
     ]
     return {
         "success": True,
         "message": "Model registry retrieved",
         "data": {
-            "ollama_status": status_info["status"],
-            "active_model": settings.OLLAMA_MODEL,
+            "provider": settings.LLM_PROVIDER,
+            "ai_status": status_info["status"],
+            "active_model": settings.LLM_MODEL,
             "models": models,
         },
     }

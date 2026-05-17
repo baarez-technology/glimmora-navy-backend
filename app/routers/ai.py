@@ -70,7 +70,7 @@ def _log_ai_interaction(
     response_model=GenericResponse[dict],
     summary="AI Chat Assistant",
     description=(
-        "Interact with the onboard LLM (Ollama) for mission-specific queries and guidance."
+        "Interact with the onboard LLM for mission-specific queries and guidance."
     ),
 )
 async def ai_chat(
@@ -78,7 +78,7 @@ async def ai_chat(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """Send a chat message to the onboard LLM (Ollama)."""
+    """Send a chat message to the configured LLM."""
     messages = [{"role": m.role, "content": m.content} for m in body.messages]
     if body.context:
         messages.insert(
@@ -89,7 +89,7 @@ async def ai_chat(
             },
         )
 
-    model = body.model or settings.OLLAMA_MODEL
+    model = body.model or settings.LLM_MODEL
     response_text = await ai_service.chat(messages, model=model)
 
     prompt_text = " ".join(m["content"] for m in messages)
@@ -368,16 +368,17 @@ async def ai_override(
 async def get_model_info(
     current_user: User = Depends(get_current_user),
 ):
-    """Return the current LLM model name and Ollama status."""
-    status_info = await ai_service.check_ollama_status()
+    """Return the current LLM model name and provider status."""
+    status_info = await ai_service.check_ai_status()
     return {
         "success": True,
         "message": "Model info retrieved",
         "data": {
-            "model_name": settings.OLLAMA_MODEL,
-            "base_url": settings.OLLAMA_BASE_URL,
+            "model_name": settings.LLM_MODEL,
+            "provider": settings.LLM_PROVIDER,
             "status": status_info["status"],
             "available": status_info["available"],
             "available_models": status_info.get("models", []),
+            "model_in_use": status_info.get("model", settings.LLM_MODEL)
         },
     }

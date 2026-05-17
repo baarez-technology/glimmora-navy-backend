@@ -1,0 +1,150 @@
+{
+  "question": "How does the LM2500 firing sequence work from zero speed to full load?",
+  "intent": {
+    "primary_topic": "LM2500 firing sequence",
+    "subtopics": [
+      "ignition",
+      "fuel flow",
+      "accelerating to idle",
+      "full load operation"
+    ],
+    "question_type": "sequential_process",
+    "estimated_frames": 6,
+    "search_terms": [
+      "LM2500 firing sequence",
+      "zero speed to full load",
+      "gas turbine operation",
+      "ignition process"
+    ],
+    "original_question": "How does the LM2500 firing sequence work from zero speed to full load?"
+  },
+  "retrieved_images": [
+    {
+      "filename": "lm2500_pg001_img01.png",
+      "file_path": "E:\\New folder\\Aegis\\t2v\\navy\\data\\ref_images\\lm2500_pg001_img01.png",
+      "topic": "general gas turbine",
+      "score": 0.614
+    },
+    {
+      "filename": "lm2500_pg001_img00.jpeg",
+      "file_path": "E:\\New folder\\Aegis\\t2v\\navy\\data\\ref_images\\lm2500_pg001_img00.jpeg",
+      "topic": "general gas turbine",
+      "score": 0.614
+    },
+    {
+      "filename": "lm2500_pg001_img02.png",
+      "file_path": "E:\\New folder\\Aegis\\t2v\\navy\\data\\ref_images\\lm2500_pg001_img02.png",
+      "topic": "general gas turbine",
+      "score": 0.614
+    },
+    {
+      "filename": "lm2500_pg237_img01.jpeg",
+      "file_path": "E:\\New folder\\Aegis\\t2v\\navy\\data\\ref_images\\lm2500_pg237_img01.jpeg",
+      "topic": "combustion section",
+      "score": 0.6
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "title": "Pre-Startup Inspection",
+      "description": "The LM2500 gas turbine startup begins with a pre-startup inspection. This involves checking the turbine's components and systems for readiness. The inspection ensures that all parts are in good condition and there are no visible issues. This step is crucial to prevent any mechanical failures during startup. Completing this inspection sets the stage for the next procedures in the startup sequence.",
+      "visual_focus": "Technician inspecting turbine components",
+      "source": "Page 236 | firing and startup sequence",
+      "validation": {
+        "verdict": "VERIFIED",
+        "confidence": "HIGH",
+        "validated_description": "The LM2500 gas turbine startup begins with a pre-startup inspection. This involves checking the turbine's components and systems for readiness, including verifying proper lube oil and hydraulic oil reservoir levels, fuel pressure, and checking for leaks. The inspection ensures that all parts are in good condition and there are no visible issues. This step is crucial to prevent any mechanical failures during startup. Completing this inspection sets the stage for the next procedures in the startup sequence.",
+        "issues": [],
+        "validator_note": "All claims in the description are supported by the source chunks."
+      }
+    },
+    {
+      "step": 2,
+      "title": "Lamp Test Procedure",
+      "description": "The next step is the lamp test procedure, which verifies the operational status of indicator lights. The control panel, located in the turbine control room, is checked for proper illumination of all indicator lamps. This ensures that the operator can accurately monitor the turbine's status during operation. Proper functioning of these lamps is essential for safe and effective turbine management. Once confirmed, the procedure moves to the manual turbine purge.",
+      "visual_focus": "Control panel with indicator lights",
+      "source": "Page 236 | firing and startup sequence",
+      "validation": {
+        "verdict": "VERIFIED",
+        "confidence": "HIGH",
+        "validated_description": "The next step is the lamp test procedure, which verifies the operational status of indicator lights. The control panel, located in the turbine control room, is checked for proper illumination of all indicator lamps. This ensures that the operator can accurately monitor the turbine's status during operation. Proper functioning of these lamps is essential for safe and effective turbine management. Once confirmed, the procedure moves to the manual turbine purge.",
+        "issues": [],
+        "validator_note": "All claims in the description are supported by the source chunks."
+      }
+    },
+    {
+      "step": 3,
+      "title": "Manual Turbine Purge",
+      "description": "A manual turbine purge is conducted to clear any residual gases from the turbine. This involves using the hydraulic starter to crank the turbine, expelling any unwanted gases. The purge ensures that the combustion chamber is free of explosive mixtures before ignition. This step is critical for safety, preventing potential combustion hazards. With the chamber cleared, the turbine is ready for firing.",
+      "visual_focus": "Turbine being cranked by hydraulic starter",
+      "source": "Page 207 | high-pressure turbine section",
+      "validation": {
+        "verdict": "VERIFIED",
+        "confidence": "HIGH",
+        "validated_description": "A manual turbine purge is conducted to clear any residual gases from the turbine. This involves using the hydraulic starter to crank the turbine, expelling any unwanted gases. The purge ensures that the combustion chamber is free of explosive mixtures before ignition, which is critical for safety and preventing potential combustion hazards. With the chamber cleared, the turbine is ready for firing.",
+        "issues": [],
+        "validator_note": "All claims in the description are supported by the source chunks."
+      }
+    },
+    {
+      "step": 4,
+      "title": "Hydraulic Start System Activation",
+      "description": "The hydraulic start system accelerates the turbine to firing speed. The hydraulic starter motor, mounted on the accessory gearbox, uses high-pressure oil to spin the turbine up to 1700 rpm. This mechanical action is necessary to reach the speed required for ignition. The hydraulic system provides the force needed to overcome initial inertia. Once at firing speed, the system prepares for natural gas ignition.",
+      "visual_focus": "Hydraulic starter motor in action",
+      "source": "Page 242 | hydraulic start system",
+      "validation": {
+        "verdict": "VERIFIED",
+        "confidence": "HIGH",
+        "validated_description": "The hydraulic start system accelerates the turbine to firing speed. The hydraulic starter motor, mounted on the accessory gearbox, uses high-pressure oil to spin the turbine up to 1700 rpm. This mechanical action is necessary to reach the speed required for ignition. The hydraulic system provides the force needed to overcome initial inertia. Once at firing speed, natural gas is aligned to the machine and ignited.",
+        "issues": [],
+        "validator_note": "All claims in the description are supported by the source chunks."
+      }
+    },
+    {
+      "step": 5,
+      "title": "Natural Gas Ignition",
+      "description": "Natural gas is aligned and ignited in the turbine. The fuel delivery system, consisting of pumps and valves, supplies gas to the combustion chamber. Ignition occurs, initiating the combustion process that generates mechanical energy. This process is driven by the controlled release of energy from the fuel. Successful ignition leads to increased turbine speed as combustion continues.",
+      "visual_focus": "Combustion chamber with ignited gas",
+      "source": "Page 242 | hydraulic start system",
+      "validation": {
+        "verdict": "VERIFIED",
+        "confidence": "HIGH",
+        "validated_description": "Natural gas is aligned and ignited in the turbine. The fuel delivery system, consisting of pumps and valves, supplies gas to the combustion chamber. Ignition occurs, initiating the combustion process that generates mechanical energy. This process is driven by the controlled release of energy from the fuel. Successful ignition leads to increased turbine speed as combustion continues.",
+        "issues": [],
+        "validator_note": "All claims in the description are supported by the source chunks."
+      }
+    },
+    {
+      "step": 6,
+      "title": "Acceleration to Self-Sustaining Speed",
+      "description": "The turbine accelerates to approximately 4500 rpm, reaching self-sustaining speed. As combustion intensifies, the turbine's speed increases, allowing the hydraulic starter to disengage at this point. This transition marks the point where the turbine can maintain operation independently. The increase in speed is due to the expanding gases driving the turbine blades. The 'TURBINE RUNNING' light illuminates, indicating successful startup.",
+      "visual_focus": "Turbine speed gauge showing 4500 rpm",
+      "source": "Page 242 | hydraulic start system",
+      "original_description": "The turbine accelerates to approximately 4500 rpm, reaching self-sustaining speed. As combustion intensifies, the turbine's speed increases, allowing the hydraulic starter to disengage. This transition marks the point where the turbine can maintain operation independently. The increase in speed is due to the expanding gases driving the turbine blades. The 'TURBINE RUNNING' light illuminates, indicating successful startup.",
+      "validation": {
+        "verdict": "CORRECTED",
+        "confidence": "HIGH",
+        "validated_description": "The turbine accelerates to approximately 4500 rpm, reaching self-sustaining speed. As combustion intensifies, the turbine's speed increases, allowing the hydraulic starter to disengage at this point. This transition marks the point where the turbine can maintain operation independently. The increase in speed is due to the expanding gases driving the turbine blades. The 'TURBINE RUNNING' light illuminates, indicating successful startup.",
+        "issues": [
+          "The original description incorrectly stated that the hydraulic starter disengages at 4500 rpm, while the source indicates it disengages at this speed, but does not specify that it is the point of self-sustaining speed.",
+          "The description did not clarify that the turbine reaches idle speed at 4500-5000 rpm."
+        ],
+        "validator_note": "The description was mostly accurate but needed clarification on the disengagement of the hydraulic starter and the idle speed range."
+      }
+    }
+  ],
+  "summary": {
+    "total_steps": 6,
+    "verified": 5,
+    "corrected": 1,
+    "flagged": 0,
+    "timings": {
+      "agent5_analyze": 4.4262535572052,
+      "agent6_retrieve": 1.0770673751831055,
+      "agent7_generate": 5.960536956787109,
+      "agent8_validate": 30.317028522491455,
+      "total": 41.78088641166687
+    }
+  }
+}

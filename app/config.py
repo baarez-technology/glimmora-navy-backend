@@ -22,6 +22,10 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
+    # LLM Settings
+    LLM_PROVIDER: str = "ollama"  # "ollama", "openai", or "google"
+    LLM_MODEL: str = "mistral"    # Default model for the chosen provider
+
     # Ollama LLM
     OLLAMA_BASE_URL: str = "http://localhost:11434"
     OLLAMA_MODEL: str = "mistral"
@@ -51,7 +55,23 @@ class Settings(BaseSettings):
                 return [origin.strip() for origin in v.split(",")]
         return v
 
+    # External AI APIs
+    OPENAI_API_KEY: str = ""
+    GOOGLE_API_KEY: str = ""
+
     model_config = {"env_file": ".env", "case_sensitive": True, "extra": "ignore"}
 
 
 settings = Settings()
+
+
+# Propagate external-API keys into os.environ so child libraries (openai SDK,
+# google SDK, t2v pipeline agents) that read them directly from the
+# environment pick them up. Pydantic-settings only populates the Settings
+# object — it does not mutate the process environment.
+import os as _os  # noqa: E402
+
+if settings.OPENAI_API_KEY and not _os.environ.get("OPENAI_API_KEY"):
+    _os.environ["OPENAI_API_KEY"] = settings.OPENAI_API_KEY
+if settings.GOOGLE_API_KEY and not _os.environ.get("GOOGLE_API_KEY"):
+    _os.environ["GOOGLE_API_KEY"] = settings.GOOGLE_API_KEY

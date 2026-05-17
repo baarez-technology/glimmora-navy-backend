@@ -93,8 +93,13 @@ services:
       REFRESH_TOKEN_EXPIRE_DAYS: 7
       ENVIRONMENT: production
       CORS_ORIGINS: '["http://localhost:3000"]'
+      # AI API Keys and Provider Settings
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+      LLM_PROVIDER: ${LLM_PROVIDER:-openai}
+      LLM_MODEL: ${LLM_MODEL:-gpt-4o-mini}
     volumes:
-      - ${AEGIS_DEV_MOUNT:-./app}:/app
+      - ${AEGIS_DEV_MOUNT:-.}:/app
     command: ${AEGIS_DEV_COMMAND:-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]

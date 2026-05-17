@@ -19,6 +19,7 @@ from app.routers import (
     scenarios,
     sessions,
     system,
+    t2v,
     users,
 )
 
@@ -94,6 +95,10 @@ tags_metadata = [
         ),
     },
     {
+        "name": "Text-to-Video",
+        "description": "Multi-agent AI pipeline for generating animated training videos from technical manuals.",
+    },
+    {
         "name": "System",
         "description": "Infrastructure health, audit logs, and global configuration settings.",
     },
@@ -136,6 +141,7 @@ app.include_router(sessions.router, prefix="/api")
 app.include_router(analytics.router, prefix="/api")
 app.include_router(certifications.router, prefix="/api")
 app.include_router(ai.router, prefix="/api")
+app.include_router(t2v.router, prefix="/api")
 app.include_router(system.router, prefix="/api")
 
 # WebSocket routes are already registered inside the session and digital_twin routers
