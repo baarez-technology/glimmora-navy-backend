@@ -17,11 +17,13 @@ from app.routers import (
     certifications,
     digital_twin,
     doctrine,
+    documentation,
     scenarios,
     sessions,
     system,
     t2v,
     users,
+    notifications,
 )
 
 logging.basicConfig(
@@ -115,6 +117,10 @@ tags_metadata = [
         "description": "Multi-agent AI pipeline for generating animated training videos from technical manuals.",
     },
     {
+        "name": "Documentation",
+        "description": "Doctrine-grounded technical documentation and study manuals managed by Instructors and Admins.",
+    },
+    {
         "name": "System",
         "description": "Infrastructure health, audit logs, and global configuration settings.",
     },
@@ -158,6 +164,8 @@ app.include_router(analytics.router, prefix="/api")
 app.include_router(certifications.router, prefix="/api")
 app.include_router(ai.router, prefix="/api")
 app.include_router(t2v.router, prefix="/api")
+app.include_router(documentation.router, prefix="/api")
+app.include_router(notifications.router, prefix="/api")
 app.include_router(system.router, prefix="/api")
 
 # WebSocket routes are already registered inside the session and digital_twin routers

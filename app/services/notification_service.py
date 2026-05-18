@@ -28,7 +28,7 @@ def create_notification(
         type=notification_type,
         title=title,
         body=body or "",
-        metadata=metadata or {},
+        extra_data=metadata or {},
         is_read=False,
         created_at=datetime.now(UTC),
     )

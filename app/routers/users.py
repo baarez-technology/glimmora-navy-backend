@@ -73,7 +73,7 @@ def _user_to_dict(user: User) -> dict:
 )
 async def list_users(
     page: int = Query(1, ge=1, description="Page number"),
-    page_size: int = Query(20, ge=1, le=100, description="Items per page"),
+    page_size: int = Query(20, ge=1, le=500, description="Items per page"),
     role_filter: str | None = Query(None, alias="role", description="Filter by user role"),
     current_user: User = Depends(require_roles("admin", "fleet")),
     db: Session = Depends(get_db),
@@ -162,7 +162,7 @@ async def create_user(
 )
 async def list_trainees(
     page: int = Query(1, ge=1, description="Page number"),
-    page_size: int = Query(20, ge=1, le=100, description="Items per page"),
+    page_size: int = Query(20, ge=1, le=500, description="Items per page"),
     current_user: User = Depends(require_roles("instructor", "evaluator", "fleet", "admin")),
     db: Session = Depends(get_db),
 ):

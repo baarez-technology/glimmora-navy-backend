@@ -2,6 +2,7 @@ from app.models.ai_audit import AIAudit
 from app.models.certification import Certification
 from app.models.competency import CompetencyRecord
 from app.models.doctrine import DoctrineDocument
+from app.models.documentation import DocumentationTopic
 from app.models.notification import Notification
 from app.models.scenario import Scenario
 from app.models.session import Session
@@ -16,5 +17,7 @@ __all__ = [
     "Certification",
     "AIAudit",
     "DoctrineDocument",
+    "DocumentationTopic",
     "Notification",
 ]
+

@@ -285,7 +285,7 @@ async def ai_scenario_hint(
 )
 async def get_audit_log(
     page: int = Query(1, ge=1),
-    page_size: int = Query(20, ge=1, le=100),
+    page_size: int = Query(20, ge=1, le=10000),
     interaction_type: str = None,
     current_user: User = Depends(require_roles("evaluator", "fleet", "admin")),
     db: Session = Depends(get_db),

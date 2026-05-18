@@ -130,7 +130,7 @@ async def list_sessions(
         None, alias="status", description="Filter by session status (active, completed, paused)"
     ),
     page: int = Query(1, ge=1, description="Page number"),
-    page_size: int = Query(20, ge=1, le=100, description="Items per page"),
+    page_size: int = Query(20, ge=1, le=10000, description="Items per page"),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -254,6 +254,48 @@ async def end_session(
         }
 
     db.commit()
+
+    # Create notifications for instructors and evaluators to issue completion certificates
+    try:
+        from app.models.scenario import Scenario
+        from app.services.notification_service import create_notification
+        import re
+
+        trainee = db.query(User).filter(User.id == session.trainee_id).first()
+        trainee_name = trainee.name if trainee else "Trainee"
+        trainee_service = trainee.service_number if trainee else "Unknown"
+
+        scenario = db.query(Scenario).filter(Scenario.id == session.scenario_id).first()
+        subject = scenario.title if scenario else "Training Scenario"
+        
+        # If it's a study manual, extract the specific topic title from instructor notes
+        if session.instructor_notes and "Fully completed study manual for" in session.instructor_notes:
+            match = re.search(r'Fully completed study manual for "([^"]+)"', session.instructor_notes)
+            if match:
+                subject = match.group(1)
+
+        # Retrieve all instructors and evaluators
+        staff_members = db.query(User).filter(User.role.in_(["instructor", "evaluator"])).all()
+        for staff in staff_members:
+            create_notification(
+                db=db,
+                user_id=staff.id,
+                notification_type="session_update",
+                title="Subject Completed — Certificate Action Required",
+                body=(
+                    f"Trainee {trainee_name} ({trainee_service}) has successfully completed the subject "
+                    f"\"{subject}\".\n\n"
+                    f"Please review their performance log and issue the corresponding completion certificate."
+                ),
+                metadata={
+                    "session_id": str(session.id),
+                    "trainee_id": str(session.trainee_id),
+                    "subject": subject,
+                    "action": "issue_certificate"
+                }
+            )
+    except Exception as notif_err:
+        logger.error("Failed to generate completion notifications: %s", notif_err, exc_info=True)
 
     await manager.broadcast(str(session_id), {"type": "status_change", "status": "completed"})
     return {

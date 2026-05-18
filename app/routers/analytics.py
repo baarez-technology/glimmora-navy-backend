@@ -247,10 +247,18 @@ async def fleet_analytics(
 )
 async def predictive_analytics(
     user_id: uuid.UUID,
-    current_user: User = Depends(require_roles("instructor", "evaluator", "fleet", "admin")),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """Simple linear trend prediction from competency history."""
+    if current_user.id != user_id and current_user.role not in (
+        "instructor",
+        "evaluator",
+        "fleet",
+        "admin",
+    ):
+        raise HTTPException(status_code=403, detail="Access denied")
+
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")

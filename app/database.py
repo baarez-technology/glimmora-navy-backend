@@ -41,6 +41,7 @@ def create_all_tables() -> None:
         certification,
         competency,
         doctrine,
+        documentation,
         notification,
         scenario,
         session,

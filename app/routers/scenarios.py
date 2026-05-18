@@ -60,7 +60,7 @@ def _scenario_to_dict(s: Scenario) -> dict:
 )
 async def list_scenarios(
     page: int = Query(1, ge=1, description="Page number to retrieve"),
-    page_size: int = Query(20, ge=1, le=100, description="Number of items per page"),
+    page_size: int = Query(20, ge=1, le=10000, description="Number of items per page"),
     domain: str | None = Query(
         None, description="Filter by operational domain (e.g., surface, subsurface)"
     ),
