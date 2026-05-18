@@ -1,0 +1,67 @@
+services:
+  # 1. FastAPI Backend API (100% Free Web Service)
+  - type: web
+    name: aegis-api-free
+    env: docker
+    plan: free
+    region: oregon
+    healthCheckPath: /health
+    envVars:
+      # Database connection (Points to the free Render PostgreSQL database defined below)
+      - key: DATABASE_URL
+        fromDatabase:
+          name: aegis-db-free
+          property: connectionString
+      
+      # Application Environment Settings
+      - key: ENVIRONMENT
+        value: production
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 60
+      - key: REFRESH_TOKEN_EXPIRE_DAYS
+        value: 7
+      - key: SECRET_KEY
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: '["*"]' # Allow all origins, or restrict to your frontend URL later
+      - key: AUTO_SEED
+        value: "true" # Automatically seeds the DB with Navy personnel and manuals on startup
+      
+      # AI & LLM Provider Configuration
+      - key: LLM_PROVIDER
+        value: google # Use Google Gemini for lightning-fast serverless AI
+      - key: LLM_MODEL
+        value: gemini-2.5-flash # Default production LLM
+      - key: GOOGLE_API_KEY
+        sync: false # Render will prompt you securely during deployment
+      - key: OPENAI_API_KEY
+        sync: false # Render will prompt you securely during deployment (optional)
+
+      # ── EXTERNAL SAAS SERVICES FOR 100% FREE TIER ──────────────────
+      # You can sign up for free accounts at Upstash, Qdrant, and Cloudflare.
+      
+      # Caching: Get a free serverless Redis database at https://upstash.com
+      - key: REDIS_URL
+        sync: false # Render will prompt you to enter your Upstash Redis URL: redis://...
+
+      # RAG: Get a free Qdrant cluster at https://cloud.qdrant.io
+      - key: QDRANT_HOST
+        sync: false # Enter your Qdrant cluster endpoint host (e.g. xxxx.gcp.qdrant.tech)
+      - key: QDRANT_PORT
+        value: 6333
+
+      # Storage: Use any S3-compatible storage (e.g., Cloudflare R2, Backblaze B2, AWS S3 free tier)
+      - key: MINIO_ENDPOINT
+        sync: false # Enter your S3 API endpoint
+      - key: MINIO_ACCESS_KEY
+        sync: false # Enter your S3 Access Key
+      - key: MINIO_SECRET_KEY
+        sync: false # Enter your S3 Secret Key
+
+databases:
+  # 2. PostgreSQL Database (Free PostgreSQL Tier — Free for 90 days)
+  - name: aegis-db-free
+    plan: free
+    region: oregon

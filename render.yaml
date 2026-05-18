@@ -1,11 +1,11 @@
 services:
-  # 1. FastAPI Backend API
+  # 1. FastAPI Backend API (Free Web Service)
   - type: web
     name: aegis-api
-    runtime: docker
     env: docker
     plan: free
     region: oregon
+    healthCheckPath: /health
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -32,25 +32,35 @@ services:
         value: 7
       - key: SECRET_KEY
         generateValue: true
+      - key: LLM_PROVIDER
+        value: google # Set to 'google' or 'openai' in production
+      - key: LLM_MODEL
+        value: gemini-2.5-flash # Default production LLM
+      - key: GOOGLE_API_KEY
+        sync: false # Render will prompt the user securely during deployment
+      - key: OPENAI_API_KEY
+        sync: false # Render will prompt the user securely during deployment
+      - key: AUTO_SEED
+        value: "true" # Automatically seeds the DB with Navy personnel and manuals on startup
       - key: OLLAMA_BASE_URL
         value: http://change-this-to-your-remote-ollama:11434
       - key: OLLAMA_MODEL
         value: mistral
       - key: CORS_ORIGINS
-        value: '["http://localhost:3000"]' # Update this to your frontend URL later
+        value: '["*"]' # Allow all origins by default in staging/prod, or restrict to your frontend URL later
 
-  # 2. Redis Cache
+  # 2. Redis Cache (Paid Redis Micro instance — $7/mo, Render free Redis is deprecated)
   - type: redis
     name: aegis-redis
-    plan: free
+    plan: micro
     region: oregon
-    ipAllowList: [] # Private to the service group
+    ipAllowList: [] # Keep private within service group
 
-  # 3. Qdrant Vector Database
+  # 3. Qdrant Vector Database (Paid Private Service — $7/mo Starter plan)
   - type: pserv
     name: aegis-qdrant
-    runtime: docker
-    plan: free
+    env: docker
+    plan: starter
     region: oregon
     envVars:
       - key: QDRANT__STORAGE__STORAGE_PATH
@@ -60,11 +70,11 @@ services:
       mountPath: /qdrant/storage
       sizeGB: 1
 
-  # 4. MinIO Object Storage
+  # 4. MinIO Object Storage (Paid Private Service — $7/mo Starter plan)
   - type: pserv
     name: aegis-minio
-    runtime: docker
-    plan: free
+    env: docker
+    plan: starter
     region: oregon
     dockerCommand: server /data --console-address ":9001"
     envVars:
@@ -78,7 +88,7 @@ services:
       sizeGB: 1
 
 databases:
-  # 5. PostgreSQL Database
+  # 5. PostgreSQL Database (Free PostgreSQL Tier — Free for 90 days)
   - name: aegis-db
     plan: free
     region: oregon

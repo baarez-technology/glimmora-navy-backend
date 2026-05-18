@@ -1,3 +1,4 @@
+import os
 import logging
 from contextlib import asynccontextmanager
 
@@ -37,6 +38,21 @@ async def lifespan(app: FastAPI):
     try:
         create_all_tables()
         logger.info("Database tables verified/created successfully")
+        
+        # Seed database if AUTO_SEED environment variable is enabled
+        if os.environ.get("AUTO_SEED", "false").lower() == "true":
+            logger.info("AUTO_SEED is enabled. Seeding default tables...")
+            from app.database import SessionLocal
+            from seeds.seed_data import seed
+            
+            db = SessionLocal()
+            try:
+                seed(db)
+                logger.info("Database seeded successfully via AUTO_SEED")
+            except Exception as seed_exc:
+                logger.error("Failed to seed database during startup: %s", seed_exc)
+            finally:
+                db.close()
     except Exception as exc:
         logger.error("Failed to create database tables: %s", exc)
     yield
