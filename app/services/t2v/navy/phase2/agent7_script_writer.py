@@ -3,14 +3,12 @@ Agent 7 — Script Writer (Navy)
 Generates animation step scripts from retrieved LM2500 content.
 """
 import json
-from openai import OpenAI
 from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from app.config import settings
 from config import LLM_STRONG, PLATFORM, SOURCE_DOC
-
-client = OpenAI(api_key=settings.OPENAI_API_KEY)
+from json_utils import safe_parse_json
 
 SYSTEM_PROMPT = f"""You are a technical animation script writer for the {PLATFORM}.
 You generate step-by-step animation scripts from the LM2500 Gas Turbine Course ({SOURCE_DOC}).
@@ -57,13 +55,5 @@ def generate(question: str, chunks: list[dict]) -> list[dict]:
         ]
     ))
 
-    clean_text = resp_text.strip()
-    if clean_text.startswith("```json"):
-        clean_text = clean_text[7:]
-    elif clean_text.startswith("```"):
-        clean_text = clean_text[3:]
-    if clean_text.endswith("```"):
-        clean_text = clean_text[:-3]
-
-    result = json.loads(clean_text.strip())
+    result = safe_parse_json(resp_text)
     return result.get("steps", [])

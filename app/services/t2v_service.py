@@ -60,11 +60,18 @@ def _run_generation(job_id: str, question: str, domain: str):
         session_id = p3.get("session_id")
 
         if video_path and Path(video_path).exists():
+            # ── Upload to Cloudinary ──────────────────────────────────────
+            from app.services import cloudinary_service
+            cloudinary_url: str | None = None
+            if cloudinary_service.is_configured():
+                cloudinary_url = cloudinary_service.upload_video(video_path, session_id, domain)
+
             _active_jobs[job_id] = {
                 "status": "completed",
                 "question": question,
                 "domain": domain,
-                "video_url": f"/api/t2v/video/{domain}/{session_id}",
+                "video_url": cloudinary_url or f"/api/t2v/video/{domain}/{session_id}",
+                "cloudinary_url": cloudinary_url,
                 "video_path": video_path,
                 "session_id": session_id,
                 "elapsed_s": p3["summary"]["timings"].get("total"),
@@ -76,6 +83,7 @@ def _run_generation(job_id: str, question: str, domain: str):
                     for s in p2.get("steps", [])
                 ],
             }
+
         else:
             _active_jobs[job_id] = {
                 "status": "failed",
@@ -122,6 +130,13 @@ def get_all_jobs():
 
 def get_video_path(domain: str, session_id: str) -> Path:
     return T2V_ROOT / domain / "data" / "output" / session_id / "final_video.mp4"
+
+def get_job_by_session(session_id: str) -> dict | None:
+    """Return the completed job dict for a given session_id, or None."""
+    for job in _active_jobs.values():
+        if job.get("session_id") == session_id:
+            return job
+    return None
 
 def get_training_modules(domain: str):
     # Add T2V_ROOT to path to import demo_config

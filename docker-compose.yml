@@ -41,23 +41,6 @@ services:
       - qdrant_data:/qdrant/storage
     # No healthcheck: Qdrant uses a distroless image with no shell tools
 
-  minio:
-    image: minio/minio:latest
-    container_name: aegis_minio
-    command: server /data --console-address ":9001"
-    environment:
-      MINIO_ROOT_USER: aegis_admin
-      MINIO_ROOT_PASSWORD: aegis_secret
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    volumes:
-      - minio_data:/data
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 15s
-      timeout: 10s
-      retries: 5
 
   # ── Ollama removed from Docker ──────────────────────────────────────────────
   # Ollama runs natively on the host to save disk space.
@@ -86,7 +69,6 @@ services:
       OLLAMA_MODEL: phi3:mini
       QDRANT_HOST: qdrant
       QDRANT_PORT: 6333
-      MINIO_ENDPOINT: minio:9000
       SECRET_KEY: change-me-in-production-use-strong-random-key
       ALGORITHM: HS256
       ACCESS_TOKEN_EXPIRE_MINUTES: 60
@@ -94,15 +76,19 @@ services:
       ENVIRONMENT: production
       CORS_ORIGINS: '["http://localhost:3000"]'
       # AI API Keys and Provider Settings
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
-      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
-      LLM_PROVIDER: ${LLM_PROVIDER:-openai}
-      LLM_MODEL: ${LLM_MODEL:-gpt-4o-mini}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-AIzaSyD1FUaRwj36kWhMD71lUYhRZUJUmgC1Nvc}
+      LLM_PROVIDER: ${LLM_PROVIDER:-google}
+      LLM_MODEL: ${LLM_MODEL:-gemini-2.5-flash}
+      # Cloudinary Storage
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME:-damy3khbz}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY:-141179135494252}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET:-l8Iay3hca4Xhvyamax90o2-phL8}
     volumes:
       - ${AEGIS_DEV_MOUNT:-.}:/app
     command: ${AEGIS_DEV_COMMAND:-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\""]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -112,5 +98,4 @@ volumes:
   postgres_data:
   redis_data:
   qdrant_data:
-  minio_data:
   # ollama_data removed — Ollama runs natively on host

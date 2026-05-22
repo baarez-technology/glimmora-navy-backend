@@ -34,11 +34,6 @@ class Settings(BaseSettings):
     QDRANT_HOST: str = "localhost"
     QDRANT_PORT: int = 6333
 
-    # MinIO Object Storage
-    MINIO_ENDPOINT: str = "localhost:9000"
-    MINIO_ACCESS_KEY: str = "aegis_admin"
-    MINIO_SECRET_KEY: str = "aegis_secret"
-
     # Application
     ENVIRONMENT: str = "development"
     CORS_ORIGINS: list[str] = ["http://localhost:3000"]
@@ -59,6 +54,11 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str = ""
     GOOGLE_API_KEY: str = ""
 
+    # Cloudinary Storage
+    CLOUDINARY_CLOUD_NAME: str = ""
+    CLOUDINARY_API_KEY: str = ""
+    CLOUDINARY_API_SECRET: str = ""
+
     model_config = {"env_file": ".env", "case_sensitive": True, "extra": "ignore"}
 
 
@@ -75,3 +75,9 @@ if settings.OPENAI_API_KEY and not _os.environ.get("OPENAI_API_KEY"):
     _os.environ["OPENAI_API_KEY"] = settings.OPENAI_API_KEY
 if settings.GOOGLE_API_KEY and not _os.environ.get("GOOGLE_API_KEY"):
     _os.environ["GOOGLE_API_KEY"] = settings.GOOGLE_API_KEY
+if settings.CLOUDINARY_CLOUD_NAME and not _os.environ.get("CLOUDINARY_CLOUD_NAME"):
+    _os.environ["CLOUDINARY_CLOUD_NAME"] = settings.CLOUDINARY_CLOUD_NAME
+if settings.CLOUDINARY_API_KEY and not _os.environ.get("CLOUDINARY_API_KEY"):
+    _os.environ["CLOUDINARY_API_KEY"] = settings.CLOUDINARY_API_KEY
+if settings.CLOUDINARY_API_SECRET and not _os.environ.get("CLOUDINARY_API_SECRET"):
+    _os.environ["CLOUDINARY_API_SECRET"] = settings.CLOUDINARY_API_SECRET

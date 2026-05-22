@@ -26,7 +26,7 @@ from config import OUTPUT_DIR, PLATFORM
 
 # ── Constants ──────────────────────────────────────────────────────────────
 DATA_DIR       = OUTPUT_DIR
-GEMINI_MODEL   = "gemini-2.0-flash" 
+GEMINI_MODEL   = "gemini-2.5-flash-image" 
 GEMINI_API_KEY = settings.GOOGLE_API_KEY
 MAX_RETRIES    = 3
 RETRY_DELAY    = 2

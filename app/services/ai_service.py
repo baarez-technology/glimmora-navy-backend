@@ -61,20 +61,33 @@ async def _chat_openai(messages: list[dict[str, str]], model: str) -> str:
 async def _chat_google(messages: list[dict[str, str]], model: str) -> str:
     try:
         client = get_google_client()
-        # Convert messages to Google format
         contents = []
+        system_instruction = None
+        is_json = False
+
         for msg in messages:
-            role = "user" if msg["role"] == "user" else "model"
+            content_lower = msg["content"].lower()
+            if "json" in content_lower:
+                is_json = True
+
             if msg["role"] == "system":
-                # Gemini handles system instructions separately or as first user message
-                # For simplicity, we'll prefix it to the next message or send as user
-                contents.append(types.Content(role="user", parts=[types.Part.from_text(text=f"System Instruction: {msg['content']}")]))
+                system_instruction = msg["content"]
             else:
+                role = "user" if msg["role"] == "user" else "model"
                 contents.append(types.Content(role=role, parts=[types.Part.from_text(text=msg["content"])]))
-        
+
+        config_args = {}
+        if system_instruction:
+            config_args["system_instruction"] = system_instruction
+        if is_json:
+            config_args["response_mime_type"] = "application/json"
+
+        config = types.GenerateContentConfig(**config_args) if config_args else None
+
         response = client.models.generate_content(
             model=model,
-            contents=contents
+            contents=contents,
+            config=config
         )
         return response.text or ""
     except Exception as exc:
@@ -112,7 +125,7 @@ async def embed(text: str, model: str | None = None) -> list[float]:
     """
     provider = settings.LLM_PROVIDER.lower()
     if provider == "google":
-        model = "text-embedding-004"
+        model = "gemini-embedding-2"
     elif provider == "ollama":
         model = settings.OLLAMA_MODEL
     else:
@@ -130,12 +143,16 @@ async def embed(text: str, model: str | None = None) -> list[float]:
         try:
             client = get_google_client()
             response = client.models.embed_content(
-                model=model, # e.g., "text-embedding-004"
-                contents=text
+                model=model,
+                contents=text,
+                config=types.EmbedContentConfig(output_dimensionality=1536)
             )
             return response.embeddings[0].values
         except Exception as exc:
             logger.error("Google embed error: %s", exc)
+            import sys, traceback
+            print(f"[ERROR] Google embed error: {exc}", file=sys.stderr)
+            traceback.print_exc(file=sys.stderr)
             return []
     else:
         # Ollama

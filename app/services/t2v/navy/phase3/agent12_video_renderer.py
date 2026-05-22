@@ -14,17 +14,13 @@ from pathlib import Path
 import sys
 
 from PIL import Image, ImageDraw
-from openai import OpenAI
 
 from app.config import settings
 from config import LLM_FAST, PLATFORM, SOURCE_DOC
-
-client = OpenAI(api_key=settings.OPENAI_API_KEY)
+from json_utils import safe_parse_json
 
 # ── Config ─────────────────────────────────────────────────────────────────
 MIN_STEP_DURATION = 4.0
-TTS_MODEL = "tts-1"
-TTS_VOICE = "alloy"
 VIDEO_W = 1376
 VIDEO_H = 768
 COL_BG    = (10, 20, 40)
@@ -51,16 +47,14 @@ def _get_audio_duration(path: str) -> float:
 
 
 def _generate_tts(text: str, output_path: Path) -> float:
+    """Generate TTS audio using gTTS (Google Text-to-Speech, free)."""
     try:
-        response = client.audio.speech.create(model=TTS_MODEL, voice=TTS_VOICE, input=text)
-        response.stream_to_file(str(output_path))
+        from gtts import gTTS
+        tts = gTTS(text=text, lang="en", slow=False)
+        tts.save(str(output_path))
         return _get_audio_duration(str(output_path))
     except Exception as e:
-        print(f"[Agent 12] TTS failed (quota/error): {e}, falling back to silent duration.")
-        # Create empty/silent file just so the path exists, or don't.
-        # But wait, ffmpeg might fail if we pass a non-existent audio file to concat.
-        # It's better to just write a short empty audio or return MIN_STEP_DURATION and let the caller handle it.
-        # Actually _get_audio_duration handles missing file by returning MIN_STEP_DURATION.
+        print(f"[Agent 12] TTS failed: {e}, falling back to silent duration.")
         return MIN_STEP_DURATION
 
 
@@ -128,15 +122,7 @@ def _llm_sync_map(narration, duration, keyframes):
             ]
         ))
         
-        clean_text = resp_text.strip()
-        if clean_text.startswith("```json"):
-            clean_text = clean_text[7:]
-        elif clean_text.startswith("```"):
-            clean_text = clean_text[3:]
-        if clean_text.endswith("```"):
-            clean_text = clean_text[:-3]
-
-        parsed = json.loads(clean_text.strip())
+        parsed = safe_parse_json(resp_text)
         sync = parsed.get("sync", [])
         if sync and len(sync) == len(keyframes):
             return sync
@@ -180,7 +166,7 @@ def _build_step_clip(kf_paths, step_num, total_steps, target_dur, output_path, f
 
     cmd = [
         "ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(concat_file),
-        "-t", f"{target_dur:.4f}", "-vf", f"scale={VIDEO_W}:{VIDEO_H}",
+        "-t", f"{target_dur:.4f}", "-vf", f"scale={VIDEO_W}:{VIDEO_H},fps=24",
         "-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", "24", str(output_path),
     ]
     ok = subprocess.run(cmd, capture_output=True).returncode == 0

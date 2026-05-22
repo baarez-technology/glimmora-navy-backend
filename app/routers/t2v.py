@@ -40,15 +40,24 @@ async def t2v_status(job_id: str, current_user: User = Depends(get_current_user)
 
 @router.get("/video/{domain}/{session_id}", summary="Serve generated video")
 async def t2v_video(domain: Literal["navy"], session_id: str):
-    """Download or stream a generated MP4 video."""
+    """Stream a generated MP4 — redirects to Cloudinary if available, else serves local file."""
+    from fastapi.responses import RedirectResponse
+
+    # Check if this session was already uploaded to Cloudinary
+    job = t2v_service.get_job_by_session(session_id)
+    if job and job.get("cloudinary_url"):
+        return RedirectResponse(url=job["cloudinary_url"], status_code=302)
+
+    # Fall back to local file
     video_path = t2v_service.get_video_path(domain, session_id)
     if not video_path.exists():
         raise HTTPException(status_code=404, detail="Video not found")
     return FileResponse(
-        str(video_path), 
-        media_type="video/mp4", 
+        str(video_path),
+        media_type="video/mp4",
         filename=f"aegis_{domain}_{session_id}.mp4"
     )
+
 
 @router.get("/jobs", summary="List all jobs")
 async def t2v_jobs(current_user: User = Depends(get_current_user)):

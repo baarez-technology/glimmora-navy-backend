@@ -3,14 +3,12 @@ Agent 5 — Question Analyzer (Navy)
 Parses user question about LM2500 Gas Turbine into structured intent object.
 """
 import json
-from openai import OpenAI
 from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from app.config import settings
 from config import LLM_FAST
-
-client = OpenAI(api_key=settings.OPENAI_API_KEY)
+from json_utils import safe_parse_json
 
 SYSTEM_PROMPT = """You are a naval engineering domain intent parser for the LM2500 Gas Turbine.
 Given a user question about LM2500 systems, operations, or maintenance, extract:
@@ -41,15 +39,7 @@ def analyze(question: str) -> dict:
         ]
     ))
     # clean JSON block if needed
-    clean_text = resp_text.strip()
-    if clean_text.startswith("```json"):
-        clean_text = clean_text[7:]
-    elif clean_text.startswith("```"):
-        clean_text = clean_text[3:]
-    if clean_text.endswith("```"):
-        clean_text = clean_text[:-3]
-    
-    intent = json.loads(clean_text.strip())
+    intent = safe_parse_json(resp_text)
     intent["original_question"] = question
     return intent
 

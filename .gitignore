@@ -15,3 +15,13 @@ env/
 
 # Docker
 .docker/
+
+# T2V generated output (images, videos, audio — stored on Cloudinary)
+app/services/t2v/navy/data/output/*/
+app/services/t2v/navy/data/chroma_db/
+app/services/t2v/navy/data/ref_images/
+
+# Scratch / dev test files
+scratch/
+scratch_test_*.png
+scratch_test_*.jpg

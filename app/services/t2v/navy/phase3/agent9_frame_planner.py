@@ -3,14 +3,12 @@ Agent 9 — Frame Planner (Navy)
 Plans 5-6 keyframe prompts per step, selects reference images.
 """
 import json
-from openai import OpenAI
 from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from app.config import settings
 from config import LLM_FAST, PLATFORM, IMAGES_DIR
-
-client = OpenAI(api_key=settings.OPENAI_API_KEY)
+from json_utils import safe_parse_json
 
 SYSTEM_PROMPT = f"""You are a keyframe planner for technical animation videos about the {PLATFORM}.
 
@@ -58,15 +56,10 @@ def plan_frames(step: dict, available_images: list[dict]) -> dict:
         ]
     ))
     
-    clean_text = resp_text.strip()
-    if clean_text.startswith("```json"):
-        clean_text = clean_text[7:]
-    elif clean_text.startswith("```"):
-        clean_text = clean_text[3:]
-    if clean_text.endswith("```"):
-        clean_text = clean_text[:-3]
-
-    result = json.loads(clean_text.strip())
+    result = safe_parse_json(resp_text)
+    if not result.get("keyframes"):
+        import sys
+        print(f"[Agent 9 DEBUG] Bad JSON for step {step['step']}:\n{repr(resp_text[:800])}", file=sys.stderr)
     return {
         "step":      step["step"],
         "title":     step["title"],
