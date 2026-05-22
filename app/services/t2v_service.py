@@ -123,10 +123,16 @@ def get_job_status(job_id: str):
     return _active_jobs.get(job_id)
 
 def get_all_jobs():
-    return [
-        {k: j[k] for k in ["status", "question", "domain"] if k in j}
-        for j in _active_jobs.values()
-    ]
+    serializable_jobs = {}
+    for job_id, job in _active_jobs.items():
+        safe_job = {}
+        for k, v in job.items():
+            if k == "video_path" and v:
+                safe_job[k] = str(v)
+            else:
+                safe_job[k] = v
+        serializable_jobs[job_id] = safe_job
+    return serializable_jobs
 
 def get_video_path(domain: str, session_id: str) -> Path:
     return T2V_ROOT / domain / "data" / "output" / session_id / "final_video.mp4"
