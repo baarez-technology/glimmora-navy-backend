@@ -34,10 +34,10 @@ async def chat(messages: list[dict[str, str]], model: str | None = None) -> str:
     Send a chat completion request to the configured LLM provider.
     """
     provider = settings.LLM_PROVIDER.lower()
-    if provider != "openai":
-        model = settings.LLM_MODEL
-    else:
-        model = model or settings.LLM_MODEL
+
+
+    # Let callers specify a model; fall back to the configured default.
+    model = model or settings.LLM_MODEL
 
     if provider == "openai":
         return await _chat_openai(messages, model)
@@ -66,12 +66,11 @@ async def _chat_google(messages: list[dict[str, str]], model: str) -> str:
         is_json = False
 
         for msg in messages:
-            content_lower = msg["content"].lower()
-            if "json" in content_lower:
-                is_json = True
-
             if msg["role"] == "system":
                 system_instruction = msg["content"]
+                # Only detect JSON intent from system prompts (where format is specified)
+                if "json" in msg["content"].lower() and ("return json" in msg["content"].lower() or "response_format" in msg["content"].lower()):
+                    is_json = True
             else:
                 role = "user" if msg["role"] == "user" else "model"
                 contents.append(types.Content(role=role, parts=[types.Part.from_text(text=msg["content"])]))
@@ -125,9 +124,9 @@ async def embed(text: str, model: str | None = None) -> list[float]:
     """
     provider = settings.LLM_PROVIDER.lower()
     if provider == "google":
-        model = "gemini-embedding-2"
+        model = model or "gemini-embedding-001"
     elif provider == "ollama":
-        model = settings.OLLAMA_MODEL
+        model = model or settings.OLLAMA_MODEL
     else:
         model = model or "text-embedding-3-small"
 

@@ -22,9 +22,16 @@ CHUNK_SIZE    = 1500
 CHUNK_OVERLAP = 150
 
 # ── Models ────────────────────────────────────────────────────
-EMBEDDING_MODEL = "text-embedding-3-small"
-LLM_FAST        = "gpt-4o-mini"
-LLM_STRONG      = "gpt-4o"
+# Embeddings use Google Gemini (must match the model used to index ChromaDB).
+EMBEDDING_MODEL = "gemini-embedding-001"
+
+# LLM models — use the globally configured model for the active provider.
+# Agents that need "strong" vs "fast" reasoning both get the same model;
+# the distinction is kept for future per-task tuning.
+from app.config import settings as _settings
+_LLM_DEFAULT = _settings.LLM_MODEL
+LLM_FAST   = _LLM_DEFAULT
+LLM_STRONG = _LLM_DEFAULT
 
 # ── Domain ────────────────────────────────────────────────────
 DOMAIN       = "navy"

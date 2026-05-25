@@ -113,7 +113,8 @@ async def start_generation(question: str, domain: str) -> str:
     }
 
     # Run in executor to not block the event loop
-    asyncio.get_event_loop().run_in_executor(
+    loop = asyncio.get_running_loop()
+    loop.run_in_executor(
         None, _run_generation, job_id, question, domain
     )
 

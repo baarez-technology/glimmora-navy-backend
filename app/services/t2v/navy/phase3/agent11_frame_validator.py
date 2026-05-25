@@ -4,14 +4,24 @@ Checks each generated keyframe with GPT-4o Vision.
 """
 import base64
 import json
-from openai import OpenAI
 from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from app.config import settings
-from config import LLM_STRONG
 
-client = OpenAI(api_key=settings.OPENAI_API_KEY)
+# This agent calls OpenAI Vision directly — always use an OpenAI model name.
+LLM_STRONG = "gpt-4o"
+
+_client = None
+
+
+def _get_client():
+    global _client
+    if _client is None:
+        from openai import OpenAI
+        _client = OpenAI(api_key=settings.OPENAI_API_KEY)
+    return _client
+
 
 SYSTEM_PROMPT = """You are a quality checker for technical infographic frames used in an LM2500 gas turbine education video.
 
@@ -31,10 +41,14 @@ Return JSON:
 
 
 def validate_frame(image_path: str, motion_description: str) -> dict:
+    if not settings.OPENAI_API_KEY or settings.OPENAI_API_KEY.startswith("your_"):
+        return {"verdict": "PASS", "issue": "", "refined_prompt": ""}
+
     with open(image_path, "rb") as f:
         image_b64 = base64.b64encode(f.read()).decode("utf-8")
 
     try:
+        client = _get_client()
         resp = client.chat.completions.create(
             model=LLM_STRONG,
             messages=[

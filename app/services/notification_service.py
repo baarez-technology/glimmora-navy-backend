@@ -60,6 +60,6 @@ def get_unread_count(db: Session, user_id: uuid.UUID) -> int:
     """Return the count of unread notifications for a user."""
     return (
         db.query(Notification)
-        .filter(Notification.user_id == user_id, not Notification.is_read)
+        .filter(Notification.user_id == user_id, Notification.is_read == False)
         .count()
     )

@@ -220,6 +220,35 @@ async def pause_session(
 
 
 @router.patch(
+    "/{session_id}/resume",
+    response_model=GenericResponse[dict],
+    summary="Resume Paused Session",
+    description="Resume a paused simulation. Accessible by Instructors and Admins.",
+)
+async def resume_session(
+    session_id: uuid.UUID,
+    current_user: User = Depends(require_roles("instructor", "evaluator", "admin")),
+    db: Session = Depends(get_db),
+):
+    """Resume a paused session."""
+    session = db.query(TrainingSession).filter(TrainingSession.id == session_id).first()
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    if session.status != "paused":
+        raise HTTPException(status_code=400, detail="Session is not paused")
+
+    session.status = "active"
+    db.commit()
+
+    await manager.broadcast(str(session_id), {"type": "status_change", "status": "active"})
+    return {
+        "success": True,
+        "message": "Session resumed",
+        "data": {"id": str(session_id), "status": "active"},
+    }
+
+
+@router.patch(
     "/{session_id}/end",
     response_model=GenericResponse[SessionOut],
     summary="Conclude Training Session",

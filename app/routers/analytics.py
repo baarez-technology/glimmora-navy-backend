@@ -194,7 +194,7 @@ async def cohort_analytics(
     ),
 )
 async def fleet_analytics(
-    current_user: User = Depends(require_roles("fleet", "admin")),
+    current_user: User = Depends(require_roles("fleet", "admin", "instructor", "evaluator", "doctrine")),
     db: Session = Depends(get_db),
 ):
     """Fleet-wide performance summary."""
